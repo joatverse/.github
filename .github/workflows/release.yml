@@ -46,10 +46,25 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install python-semantic-release
+        if: inputs.runtime == 'python'
+        run: pip install python-semantic-release==9.15.2
+
       - name: Release (python)
         if: inputs.runtime == 'python'
-        uses: python-semantic-release/python-semantic-release@v9.15.2
-        with:
-          github_token: ${{ secrets.token }}
-          commit: false
-          push: false
+        env:
+          GH_TOKEN: ${{ secrets.token }}
+        run: |
+          set -e
+          VERSION=$(semantic-release version --print)
+          if [ -z "$VERSION" ]; then
+            echo "No release needed."
+            exit 0
+          fi
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists."
+            exit 0
+          fi
+          semantic-release changelog
+          gh release create "$TAG" --title "$TAG" --notes-file CHANGELOG.md --target "$GITHUB_SHA"
