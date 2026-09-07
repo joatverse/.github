@@ -51,3 +51,5 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v9.15.2
         with:
           github_token: ${{ secrets.token }}
+          commit: false
+          push: false
