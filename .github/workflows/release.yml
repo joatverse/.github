@@ -2,6 +2,11 @@ name: Release
 
 on:
   workflow_call:
+    inputs:
+      runtime:
+        description: "node or python"
+        type: string
+        default: node
     secrets:
       token:
         required: true
@@ -20,14 +25,29 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node
+        if: inputs.runtime == 'node'
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install dependencies
+      - name: Install dependencies (node)
+        if: inputs.runtime == 'node'
         run: npm ci
 
-      - name: Release
+      - name: Release (node)
+        if: inputs.runtime == 'node'
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
+
+      - name: Setup Python
+        if: inputs.runtime == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Release (python)
+        if: inputs.runtime == 'python'
+        uses: python-semantic-release/python-semantic-release@v9.15.2
+        with:
+          github_token: ${{ secrets.token }}
