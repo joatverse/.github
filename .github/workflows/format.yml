@@ -36,6 +36,10 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Setup uv
+        if: inputs.runtime == 'python'
+        uses: astral-sh/setup-uv@v10.0.1
+
       - name: Ruff check + format --check (python)
         if: inputs.runtime == 'python'
         run: |
