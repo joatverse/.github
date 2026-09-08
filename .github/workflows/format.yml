@@ -1,0 +1,43 @@
+name: Format
+
+on:
+  workflow_call:
+    inputs:
+      runtime:
+        description: "node or python"
+        type: string
+        default: node
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: inputs.runtime == 'node'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Prettier --check (node)
+        if: inputs.runtime == 'node'
+        run: |
+          npm ci
+          npx prettier --check .
+
+      - name: Setup Python
+        if: inputs.runtime == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Ruff check + format --check (python)
+        if: inputs.runtime == 'python'
+        run: |
+          uvx ruff check .
+          uvx ruff format --check .
