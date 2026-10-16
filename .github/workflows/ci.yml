@@ -1,0 +1,12 @@
+name: CI
+
+# This repo hosts the reusable workflows, so it calls its own copy by local path.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  pr-title:
+    permissions:
+      pull-requests: read
+    uses: ./.github/workflows/pr-title.yml
