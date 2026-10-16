@@ -1,0 +1,25 @@
+name: PR title
+
+# The squash commit on main takes the PR title (squash_merge_commit_title=PR_TITLE),
+# and semantic-release reads only main — so the title is what decides the release.
+# commitlint checks branch commits only; this checks the title.
+#
+# Callers must trigger on pull_request types [opened, edited, synchronize, reopened]
+# so a retitle re-runs the check without a new push.
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Lint PR title
+        # Pinned to the commit SHA, not the tag — tags can be re-pointed (tj-actions, Mar 2025).
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Default types = @commitlint/config-conventional's 11. If a repo's
+        # commitlint config ever adds a custom type, add a `types:` input here.
